@@ -1,5 +1,16 @@
 # dsh-think-ux
 
+> ### 本地改版快照 · Local build snapshot
+>
+> **这不是上游官方仓库**，而是我在本机跑的改版快照：基于上游
+> [`el16z3c/dsh-think-ux`](https://github.com/el16z3c/dsh-think-ux) 的
+> `dsh-think-ux@0.1.3`（MIT）。与上游的差异：**所有展开的思考体都限高 24 行并框内滚动**——
+> 上游的限高只作用于插件自动托管的流式预览行，用户手动点开的思考行会整段铺满屏幕；此外是
+> 配套的 README 更新与 `package.json` 的 `version`（`0.1.3-local.1`）/ `description`。
+> 上游版权归 el16z3c / carl.cz，本仓库不是上游的发布渠道。
+
+---
+
 Smooth "thinking" experience for the DeepSeek Harness (dsh) Web UI: while a
 model reasons, its think row expands as a capped 24-line preview that glides
 to the bottom as text streams in (a think body you open by hand is capped the

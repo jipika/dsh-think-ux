@@ -1,5 +1,16 @@
 # dsh-think-ux（中文）
 
+> ### 本地改版快照 · Local build snapshot
+>
+> **这不是上游官方仓库**，而是我在本机跑的改版快照：基于上游
+> [`el16z3c/dsh-think-ux`](https://github.com/el16z3c/dsh-think-ux) 的
+> `dsh-think-ux@0.1.3`（MIT）。与上游的差异：**所有展开的思考体都限高 24 行并框内滚动**——
+> 上游的限高只作用于插件自动托管的流式预览行，用户手动点开的思考行会整段铺满屏幕；此外是
+> 配套的 README 更新与 `package.json` 的 `version`（`0.1.3-local.1`）/ `description`。
+> 上游版权归 el16z3c / carl.cz，本仓库不是上游的发布渠道。
+
+---
+
 DeepSeek Harness (dsh) Web 端「思考盒」体验插件：模型推理时，think 行自动展开为 24 行限高预览，流式文本平滑上滚（指数追逐，70 ms 时间常数）；自己手动点开的思考行同样 24 行限高、框内滚动；推理结束后预览以 180 ms 高度动画收起，而不是 ~490 px 的一帧跳变。主对话视图同样平滑追底：长会话打开飞速 swoosh 到底，流式插入以 ~960 px/s 匀速滑行；`scrollTop` 写陷阱把「读者意图」与「bundle 回钉」从结构上区分开，不再互相拉扯。
 
 纯 DOM 客户端插件：不改 bundle、不申服务、不发网络请求。已在 DSH 0.1.5-rc.2 验证。
