@@ -1,5 +1,5 @@
 {
-  "name": "dsh-think-ux",
+  "name": "@jipika/dsh-think-ux",
   "version": "0.1.3-local.1",
   "description": "Smooth think-row preview + bottom-follow glide for the DeepSeek Harness (dsh) Web UI: a pure DOM client plugin, no bundle changes. Local build: every open think body is line-capped and scrolls internally.",
   "license": "MIT",

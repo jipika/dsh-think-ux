@@ -1,6 +1,10 @@
-# dsh-think-ux bundle patch: registers the client plugin into the Web UI.
+# @jipika/dsh-think-ux bundle patch: registers the client plugin into the Web UI.
 # The entry is resolved from this package's exports (lib/index.js); the
 # browser half (lib/client.js) does all the work — pure DOM, no services.
+#
+# `name` MUST equal package.json's name, scoped specifier included: the bundle
+# channel resolves the entry by that exact specifier, and a short name makes
+# the whole plugin tree fail to load.
 - insert:
     - id: dsh-think-ux
-      name: 'dsh-think-ux'
+      name: '@jipika/dsh-think-ux'
