@@ -2,7 +2,8 @@
 
 Smooth "thinking" experience for the DeepSeek Harness (dsh) Web UI: while a
 model reasons, its think row expands as a capped 24-line preview that glides
-to the bottom as text streams in; when reasoning settles, the preview
+to the bottom as text streams in (a think body you open by hand is capped the
+same way and scrolls inside its box); when reasoning settles, the preview
 collapses with a short height animation instead of a one-frame ~490 px
 jump. The main conversation view follows the same way — streamed output
 glides up (long-session opens swoosh), and a `scrollTop` write trap makes
@@ -35,7 +36,7 @@ Refresh; the Web UI returns to stock behavior. Nothing to clean up.
 
 | Constant | Default | Effect |
 |---|---|---|
-| `CAP_LINES` | 24 | think-preview line cap |
+| `CAP_LINES` | 24 | open think-body line cap (streaming preview + hand-opened) |
 | `CHASE_TAU_MS` | 70 | glide exponential time constant (both chasers) |
 | `CHASE_MAX_PX` | 16 | constant glide speed (px per 60 fps frame, ~960 px/s) |
 | `GAP_FAST_MIN` | 800 | episode split: starting gap ≥ this = pure exponential swoosh, below = constant glide |
@@ -85,20 +86,24 @@ If you see that page naming `dsh-think-ux`, you are on 0.1.0 — run
    detached node); `COLLAPSE_MS = 0` restores the instant unmount.
    History rows and rows under `[data-turn-process-inline][hidden]` are left
    alone.
-   While auto-expanded, the body is a **capped preview**: at most 24 lines
-   (line height taken from the bundle's own secondary-content token,
-   `calc(20px + var(--dsh-content-font-delta-secondary,0px))`), with 24 px
-   top/bottom fades. It is a hidden-scrollbar scroll box that a single rAF
-   ticker **chases to the bottom** with the main view's smooth-episode
-   step (70 ms time constant `CHASE_TAU_MS`, constant `CHASE_MAX_PX`
-   speed ~960 px/s — the preview body is at most ~500 px, below the
-   `GAP_FAST_MIN` threshold, so it always glides), so appended streaming
-   text glides up smoothly instead of jumping in token chunks. A reader scroll up inside the preview
-   **pauses** that row's follow (terminal style); returning within 25 px of
-   the bottom resumes it. The cap applies only to plugin-managed rows: a
-   reader toggle lifts it permanently for that row (their expansion is
-   full-height and unscrollable), and settle auto-collapse removes it
-   anyway.
+   Every open think body is **height-capped**: at most 24 lines (line height
+   taken from the bundle's own secondary-content token,
+   `calc(20px + var(--dsh-content-font-delta-secondary,0px))`), scrolling
+   inside its own box. While auto-expanded, that box is the **capped
+   preview**: a hidden-scrollbar scroller with 24 px top/bottom fades that a
+   single rAF ticker **chases to the bottom** with the main view's
+   smooth-episode step (70 ms time constant `CHASE_TAU_MS`, constant
+   `CHASE_MAX_PX` speed ~960 px/s — the preview body is at most ~500 px,
+   below the `GAP_FAST_MIN` threshold, so it always glides), so appended
+   streaming text glides up smoothly instead of jumping in token chunks. A
+   reader scroll up inside the preview **pauses** that row's follow
+   (terminal style); returning within 25 px of the bottom resumes it.
+   The cap is NOT lifted when the reader toggles a row by hand: a manual
+   expand used to render full-height and shove the conversation off-screen,
+   so it keeps the cap and scrolls internally — it only drops the preview
+   extras (hidden scrollbar and fades stay scoped to plugin-managed rows; a
+   reader-opened body keeps its native scrollbar as the "there is more"
+   affordance). Settle auto-collapse still removes the managed cap anyway.
 
 2. **Reader scroll intent via a `scrollTop` write trap.** Any reader-initiated
    upward movement (wheel up, touch finger-down drag, PageUp/Home/ArrowUp, or
@@ -339,15 +344,20 @@ restart needed). On a DSH version upgrade: rerun `deploy.ps1 -Version
   which the plugin re-manages (re-expand while running, collapse on settle).
   The takeover branch makes the loss degrade to "default policy" instead of
   "stuck expanded".
-- **Nested preview scroller.** The capped body is a hidden-scrollbar scroller
-  nested inside the main conversation scroller. A reader wheel/touch up
-  inside the preview bubbles to the main scroller's listeners and can arm the
+- **Nested think-body scroller.** A capped think body is a scroller nested
+  inside the main conversation scroller — hidden-scrollbar for plugin-managed
+  rows, native-scrollbar for hand-opened ones. A reader wheel/touch up
+  inside it bubbles to the main scroller's listeners and can arm the
   700 ms intent window — the desired semantics (reading up anywhere pauses the
-  main-view yank), but the two scroll layers share the intent system. The
-  re-pin trap only watches the MAIN scroller's `scrollTop`; preview scrolling
-  never passes through it and is unaffected by intent state. If a future
-  bundle adds its own per-row scroll handling, the smooth follow degrades to
-  plain (janky) auto-scroll or none — the row features are unaffected.
+  main-view yank), but the two scroll layers share the intent system. Since
+  every open body is capped, a hand-opened row now consumes wheel/touch until
+  its box reaches an edge, where the gesture chains to the main view (before
+  the cap it had no scroller of its own and every gesture went straight to the
+  conversation). The re-pin trap only watches the MAIN scroller's `scrollTop`;
+  think-body scrolling never passes through it and is unaffected by intent
+  state. If a future bundle adds its own per-row scroll handling, the smooth
+  follow degrades to plain (janky) auto-scroll or none — the row features are
+  unaffected.
 - **Capped preview line count.** The 24-line cap is computed from the bundle's
   secondary-content line-height token; if a future version changes that token
   the cap drifts by a fraction of a line (cosmetic only — the box stays
